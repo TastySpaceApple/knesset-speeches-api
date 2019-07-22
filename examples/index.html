@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Alef&display=swap" rel="stylesheet">
+    <style type="text/css">
+      html, body {margin: 0; padding: 0}
+      h1, .speech, .speeches, .speakers { direction: rtl; text-align: right; }
+      h1, .speech{
+        font-family: 'Alef', sans-serif;
+      }
+      h1 {padding: 0 1em;}
+      .speech{ padding: 2em 0; }
+      .speech div {
+        max-width: 60em;
+        margin: auto;
+        padding-right: 7em;
+      }
+      .speech img{
+        float: right;
+        margin-right: -7em;
+        width: 5em;
+      }
+      .speech p{
+        word-break: break-word;
+      }
+      .speech:nth-child(2n) { background-color: #F3F1EB; }
+      .speakers{
+        list-style: none;
+        padding: 1em;
+        text-align: center;
+      }
+
+
+      .speakers li{
+        font-family: 'Alef', sans-serif;
+        display: inline-block;
+        width: 5em;
+        height: 10em;
+        text-align: center;
+        padding: .5em;
+        vertical-align: top;
+        margin: .5em;
+        background-color: #F3F1EB;
+          word-break: break-word;
+          font-size: .8em;
+      }
+      .speakers img{
+        height: 5em;
+        margin: auto;
+        display: block;
+      }
+    </style>
+    <title></title>
+  </head>
+  <body>
+    <section>
+      <h1>דוברים</h1>
+      <ul class="speakers">
+      </ul>
+    </section>
+    <article class="speeches">
+    </article>
+    <script type="text/javascript">
+      function get(url, params){
+      	let xhr = new XMLHttpRequest();
+      	let queryString = params ? Object.keys(params).map(key => key + '=' + params[key]).join('&') : '';
+      	xhr.open("GET", url + '?' + queryString);
+
+      	return new Promise( (resolve, reject) => {
+      	  xhr.addEventListener("load", () => {
+      		  resolve(JSON.parse(xhr.responseText));
+      	  });
+      	  xhr.send(null);
+        })
+      }
+
+      get('/api/speeches', {protocolId: 81275}).then(data => {
+        console.log(data);
+        let speakers = [];
+        document.querySelector('.speeches').innerHTML = data.map(speech => {
+          let speaker = trim(speech.speaker);
+          if(!speakers.includes(speaker)) speakers.push(speaker);
+          return formatSpeechHTML(speaker, speech.paragraphs);
+        }).join('');
+
+        document.querySelector('.speakers').innerHTML = speakers.map(speaker => {
+          return `<li><img src="${ getMemberImageUrlByName(speaker) }"> ${ speaker.substring(0, speaker.length-1) }</li>`;
+        }).join('');
+      })
+
+      function getMemberImageUrlByName(speaker){
+        let speakerName = trim(speaker.split('(')[0])
+        if(/יו\"ר/.test(speakerName)){
+          console.log(speakerName);
+          speakerName = speakerName.substring(6, speakerName.length - 1);
+          console.log(speakerName);
+        }
+        return "/api/images/mk?name=" + encodeURIComponent(speakerName);
+      }
+      function formatSpeechHTML(speaker, paragraphs) {
+        return `<div class="speech"><div><img src="${ getMemberImageUrlByName(speaker) }"><b>${ speaker }</b><p>${ paragraphs.map(text => '<p>' + trim(text) + '</p>').join('') }</p></div></div>`;
+      }
+
+      function trim(text){
+        return text.replace(/\u00A0/g, ' ').replace(/\s+/, ' ').replace(/(^\s+|\s+$)/g, '')
+      }
+    </script>
+  </body>
+</html>

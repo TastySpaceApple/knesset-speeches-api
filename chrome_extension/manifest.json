@@ -1,0 +1,13 @@
+{
+  "manifest_version": 2,
+  "name": "Knesset Scraper",
+  "version": "0.1",
+  "content_scripts": [
+  {
+    "matches": [
+      "http://online.knesset.gov.il/*"
+    ],
+    "js": ["content.js"]
+  }
+]
+}

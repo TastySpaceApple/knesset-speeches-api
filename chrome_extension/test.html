@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <script src="data.js" charset="utf-8"></script>
+    <script type="text/javascript">
+      let doc = document.createElement('div');
+      console.log(data.pages[0].sContent);
+      doc.innerHTML = data.pages[0].sContent;
+      let conversation = [];
+      let message = null;
+      for(var i=0, len=doc.children.length; i<len; i++){
+        if(doc.children[i].className == "SPEAKER" || doc.children[i].className == "YOR"){
+          conversation.push(message);
+          message = {speaker: doc.children[i].textContent, text: '', timing: doc.children[i].firstChild.id}
+        }
+        if(message != null){
+          if(doc.children[i].textContent != message.speaker)
+            message.text += doc.children[i].textContent;
+        }
+      }
+      conversation.push(message);
+      console.log(conversation);
+    </script>
+  </body>
+</html>
